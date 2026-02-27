@@ -46,12 +46,12 @@ export default function Catalogues() {
         <div className="space-y-6">
             <header className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900">Catalogues</h1>
+                    <h1 className="text-2xl font-bold">Catalogues</h1>
                     <p className="text-slate-500">Gérez des ensembles de produits et des prix spécifiques pour vos marchés.</p>
                 </div>
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-slate-800 transition-colors"
+                    className="flex items-center gap-2 bg-brand-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-brand-700 transition-colors"
                 >
                     <Plus className="h-4 w-4" />
                     Créer un catalogue
@@ -61,16 +61,16 @@ export default function Catalogues() {
             {catalogs.length === 0 && !loading ? (
                 <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-12 text-center">
                     <div className="mx-auto h-20 w-20 rounded-full bg-slate-50 flex items-center justify-center mb-6">
-                        <Tag className="h-10 w-10 text-slate-300" />
+                        <Tag className="h-10 w-10 text-slate-700 dark:text-slate-300" />
                     </div>
-                    <h2 className="text-xl font-semibold text-slate-900">Proposez des prix différents selon vos clients</h2>
+                    <h2 className="text-xl font-semibold">Proposez des prix différents selon vos clients</h2>
                     <p className="mt-2 text-slate-500 max-w-md mx-auto">
                         Les catalogues vous permettent de personnaliser les prix et la disponibilité des produits pour des marchés spécifiques ou des segments de clients (B2B, VIP).
                     </p>
                     <div className="mt-8 flex justify-center gap-3">
                         <button
                             onClick={() => setIsModalOpen(true)}
-                            className="bg-slate-900 text-white px-6 py-3 rounded-md text-sm font-semibold hover:bg-slate-800 transition-colors shadow-sm"
+                            className="bg-brand-600 text-white px-6 py-3 rounded-md text-sm font-semibold hover:bg-brand-700 transition-colors shadow-sm"
                         >
                             Créer votre premier catalogue
                         </button>
@@ -80,7 +80,7 @@ export default function Catalogues() {
                 <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
                     {loading ? (
                         <div className="p-12 flex justify-center">
-                            <Loader2 className="h-8 w-8 text-slate-400 animate-spin" />
+                            <Loader2 className="h-8 w-8 text-slate-600 dark:text-slate-400 animate-spin" />
                         </div>
                     ) : (
                         <table className="w-full text-left">
@@ -99,7 +99,7 @@ export default function Catalogues() {
                                             {catalog.name}
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${catalog.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-800'
+                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${catalog.status === 'active' ? 'bg-brand-500/10 text-brand-400' : 'bg-slate-100 text-slate-800'
                                                 }`}>
                                                 {catalog.status === 'active' ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
                                                 {catalog.status === 'active' ? 'Actif' : 'Inactif'}
@@ -109,7 +109,7 @@ export default function Catalogues() {
                                             {catalog.marketIds.length} marché(s)
                                         </td>
                                         <td className="px-6 py-4 text-right">
-                                            <button className="text-slate-400 hover:text-slate-600">
+                                            <button className="text-slate-600 dark:text-slate-400 hover:text-slate-600">
                                                 <MoreHorizontal className="h-5 w-5" />
                                             </button>
                                         </td>
@@ -150,7 +150,7 @@ export default function Catalogues() {
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             placeholder="Ex: Tarifs B2B France"
-                            className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm border p-2"
+                            className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm border p-2"
                         />
                     </div>
                     <div>
@@ -159,7 +159,7 @@ export default function Catalogues() {
                             multiple
                             value={formData.marketIds}
                             onChange={(e) => setFormData({ ...formData, marketIds: Array.from(e.target.selectedOptions, option => option.value) })}
-                            className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm border p-2 bg-white"
+                            className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm border p-2 bg-white"
                         >
                             {markets.map(market => (
                                 <option key={market.id} value={market.id}>{market.name}</option>
@@ -177,7 +177,7 @@ export default function Catalogues() {
                         </button>
                         <button
                             type="submit"
-                            className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-slate-800"
+                            className="flex items-center gap-2 bg-brand-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-brand-700"
                         >
                             <Save className="h-4 w-4" />
                             Créer le catalogue

@@ -1,206 +1,153 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Search, Globe, MoreHorizontal, CheckCircle2, XCircle, Save, Loader2 } from 'lucide-react';
-import { Modal } from '../components/Modal';
-import { marketService } from '../lib/api';
+import React from 'react';
+import { Globe, MapPin, Plus, MoreHorizontal, TrendingUp, ShoppingBag, ArrowRight } from 'lucide-react';
+import { PremiumCard } from '../components/ui/PremiumCard';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const markets = [
+    { id: 1, name: 'France (Principal)', type: 'Primaire', status: 'Actif', domains: 'shopora.fr', regions: 'France', sales: '8,450 €' },
+    { id: 2, name: 'Union Européenne', type: 'Expansion', status: 'Actif', domains: 'shopora.com/eu', regions: '26 pays', sales: '3,200 €' },
+    { id: 3, name: 'États-Unis', type: 'Expansion', status: 'Inactif', domains: 'shopora.us', regions: 'USA', sales: '0 €' },
+];
 
 export default function Markets() {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [markets, setMarkets] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [formData, setFormData] = useState({ name: '', countries: [], currency: 'EUR', status: 'inactive' });
-
-    useEffect(() => {
-        fetchMarkets();
-    }, []);
-
-    const fetchMarkets = async () => {
-        try {
-            setLoading(true);
-            const response = await marketService.getAll();
-            setMarkets(response.data);
-        } catch (error) {
-            console.error('Failed to fetch markets:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            await marketService.create({
-                ...formData,
-                countries: typeof formData.countries === 'string'
-                    ? formData.countries.split(',').map(c => c.trim()).filter(Boolean)
-                    : formData.countries
-            });
-            setIsModalOpen(false);
-            fetchMarkets();
-            setFormData({ name: '', countries: [], currency: 'EUR', status: 'inactive' });
-        } catch (error) {
-            console.error('Failed to create market:', error);
-        }
-    };
-
     return (
-        <div className="space-y-6">
-            <header className="flex items-center justify-between">
+        <div className="space-y-10 pb-20">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900">Marchés</h1>
-                    <p className="text-slate-500">Configurez vos zones de vente, devises et langues par région.</p>
+                    <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">Markets</h1>
+                    <p className="text-slate-500 font-medium">Gérez vos stratégies de vente internationales et locales.</p>
                 </div>
-                <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-slate-800 transition-colors"
-                >
-                    <Plus className="h-4 w-4" />
-                    Créer un marché
-                </button>
-            </header>
 
-            <div className="bg-white rounded-lg border border-slate-200 shadow-sm">
-                <div className="p-4 border-b border-slate-200 bg-slate-50/50 flex items-center gap-4">
-                    <div className="relative flex-1 max-w-sm">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input
-                            type="text"
-                            placeholder="Rechercher un marché..."
-                            className="w-full pl-10 pr-4 py-2 rounded-md border border-slate-300 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none"
-                        />
+                <button className="btn-premium py-3 group">
+                    <Plus className="h-4 w-4 group-hover:rotate-90 transition-transform duration-300" />
+                    Créer un nouveau marché
+                </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {[
+                    { label: 'Marchés Actifs', value: '2', color: 'text-brand-400' },
+                    { label: 'Régions Total', value: '28', color: 'text-brand-400' },
+                    { label: 'Ventes Globales', value: '11,650 €', color: 'text-slate-900 dark:text-white' },
+                ].map((s, i) => (
+                    <PremiumCard key={s.label} delay={i * 0.1}>
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{s.label}</p>
+                        <p className={`text-2xl font-black mt-1 ${s.color}`}>{s.value}</p>
+                    </PremiumCard>
+                ))}
+            </div>
+
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                className="glass-card overflow-hidden"
+            >
+                <div className="p-6 border-b border-black/5 dark:border-white/5 bg-white/[0.02] flex items-center justify-between">
+                    <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Marchés configurés</h2>
+                    <div className="flex items-center gap-3">
+                        <span className="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">Priorité automatique activée</span>
                     </div>
                 </div>
 
                 <div className="overflow-x-auto">
-                    {loading ? (
-                        <div className="p-12 flex justify-center">
-                            <Loader2 className="h-8 w-8 text-slate-400 animate-spin" />
-                        </div>
-                    ) : (
-                        <table className="w-full text-left">
-                            <thead className="bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                <tr>
-                                    <th className="px-6 py-4">Marché</th>
-                                    <th className="px-6 py-4">Statut</th>
-                                    <th className="px-6 py-4">Pays/Régions</th>
-                                    <th className="px-6 py-4">Devise</th>
-                                    <th className="px-6 py-4 text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-200">
-                                {markets.map((market) => (
-                                    <tr key={market.id} className="hover:bg-slate-50 transition-colors">
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="h-8 w-8 rounded bg-slate-100 flex items-center justify-center text-slate-500">
-                                                    <Globe className="h-4 w-4" />
+                    <table className="w-full">
+                        <thead>
+                            <tr className="border-b border-black/5 dark:border-white/5 bg-white/[0.01]">
+                                {['Marché', 'Type', 'Statut', 'Portée (Régions)', 'Revenus', ''].map(h => (
+                                    <th key={h} className="px-8 py-4 text-left text-[10px] font-black text-slate-500 uppercase tracking-widest">{h}</th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <AnimatePresence mode="popLayout">
+                                {markets.map((market, i) => (
+                                    <motion.tr
+                                        key={market.id}
+                                        initial={{ opacity: 0, x: -10 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: i * 0.05 }}
+                                        className="group hover:bg-white/[0.03] border-b border-black/5 dark:border-white/5 cursor-pointer transition-colors"
+                                    >
+                                        <td className="px-8 py-5">
+                                            <div className="flex items-center gap-4">
+                                                <div className="h-10 w-10 rounded-xl bg-white/5 border border-black/5 dark:border-white/5 flex items-center justify-center text-slate-500 group-hover:text-brand-400 group-hover:bg-brand-500/10 transition-all duration-300">
+                                                    <Globe className="h-5 w-5" />
                                                 </div>
                                                 <div>
-                                                    <div className="font-medium text-slate-900">{market.name}</div>
+                                                    <p className="text-sm font-black text-slate-900 dark:text-white group-hover:text-brand-400 transition-colors uppercase tracking-tight">{market.name}</p>
+                                                    <p className="text-[10px] text-slate-600 font-black uppercase tracking-widest mt-0.5">{market.domains}</p>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${market.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-800'
-                                                }`}>
-                                                {market.status === 'active' ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
-                                                {market.status === 'active' ? 'Actif' : 'Inactif'}
+                                        <td className="px-8 py-5">
+                                            <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest border border-black/5 dark:border-white/5 ${market.type === 'Primaire' ? 'bg-brand-500/10 text-brand-400' : 'bg-brand-500/10 text-brand-400'}`}>
+                                                {market.type}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 text-sm text-slate-600">
-                                            {market.countries.join(', ')}
+                                        <td className="px-8 py-5">
+                                            <div className="flex items-center gap-2">
+                                                <div className={`h-1.5 w-1.5 rounded-full ${market.status === 'Actif' ? 'bg-brand-500 shadow-[0_0_8px_rgba(52,211,153,0.5)]' : 'bg-slate-600'}`}></div>
+                                                <span className={`text-[10px] font-black uppercase tracking-widest ${market.status === 'Actif' ? 'text-slate-900 dark:text-white' : 'text-slate-600'}`}>
+                                                    {market.status}
+                                                </span>
+                                            </div>
                                         </td>
-                                        <td className="px-6 py-4 text-sm font-medium text-slate-900">
-                                            {market.currency}
+                                        <td className="px-8 py-5">
+                                            <div className="flex items-center gap-2">
+                                                <MapPin className="h-3 w-3 text-slate-600" />
+                                                <span className="text-xs font-bold text-slate-600 dark:text-slate-400">{market.regions}</span>
+                                            </div>
                                         </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <button className="text-slate-400 hover:text-slate-600">
-                                                <MoreHorizontal className="h-5 w-5" />
+                                        <td className="px-8 py-5">
+                                            <div className="flex items-center gap-2">
+                                                <TrendingUp className="h-3 w-3 text-brand-500" />
+                                                <span className="text-sm font-black text-slate-900 dark:text-white tracking-tighter">{market.sales}</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-5 text-right">
+                                            <button className="p-2 rounded-xl hover:bg-white/10 text-slate-500 hover:text-slate-900 dark:text-white transition-all">
+                                                <ArrowRight className="h-5 w-5" />
                                             </button>
                                         </td>
-                                    </tr>
+                                    </motion.tr>
                                 ))}
-                                {markets.length === 0 && (
-                                    <tr>
-                                        <td colSpan="5" className="px-6 py-12 text-center text-slate-500">
-                                            Aucun marché trouvé.
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    )}
+                            </AnimatePresence>
+                        </tbody>
+                    </table>
                 </div>
-            </div>
+            </motion.div>
 
-            <Modal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                title="Créer un nouveau marché"
-            >
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700">Nom du marché</label>
-                        <input
-                            type="text"
-                            required
-                            value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            placeholder="Ex: États-Unis et Canada"
-                            className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm border p-2"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700">Pays / Régions (séparés par des virgules)</label>
-                        <input
-                            type="text"
-                            value={formData.countries}
-                            onChange={(e) => setFormData({ ...formData, countries: e.target.value })}
-                            placeholder="FR, US, CA"
-                            className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm border p-2"
-                        />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700">Devise</label>
-                            <select
-                                value={formData.currency}
-                                onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                                className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm border p-2 bg-white"
-                            >
-                                <option value="EUR">Euro (EUR)</option>
-                                <option value="USD">US Dollar (USD)</option>
-                            </select>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <PremiumCard delay={0.6} className="bg-gradient-to-br from-brand-500/5 to-transparent border-brand-500/10 group cursor-pointer overflow-hidden">
+                    <div className="absolute -bottom-6 -right-6 h-32 w-32 bg-brand-500/10 blur-[40px] rounded-full group-hover:scale-150 transition-transform duration-700"></div>
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white mb-4 uppercase tracking-widest text-glow flex items-center gap-3">
+                        <ShoppingBag className="h-4 w-4 text-brand-400" />
+                        Vendre à l'international
+                    </h3>
+                    <p className="text-xs text-slate-500 leading-relaxed mb-6 font-medium">Développez votre business en activant les marchés transfrontaliers avec conversion automatique de devises.</p>
+                    <button className="btn-premium py-2 w-full text-[10px]">Activer Expansion Global</button>
+                </PremiumCard>
+
+                <PremiumCard delay={0.7}>
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white mb-4 uppercase tracking-widest flex items-center gap-3 text-slate-600 dark:text-slate-400">
+                        <Globe className="h-4 w-4" />
+                        Domaines et Sous-répertoires
+                    </h3>
+                    <div className="space-y-3">
+                        <div className="p-3 rounded-2xl bg-white/5 border border-black/5 dark:border-white/5 flex items-center justify-between text-[10px] font-black uppercase tracking-widest">
+                            <span className="text-slate-600">FRANCE</span>
+                            <span className="text-slate-900 dark:text-white">shopora.fr</span>
+                            <span className="text-brand-500/50">CONNECTÉ</span>
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700">Statut initial</label>
-                            <select
-                                value={formData.status}
-                                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                                className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm border p-2 bg-white"
-                            >
-                                <option value="inactive">Inactif</option>
-                                <option value="active">Actif</option>
-                            </select>
+                        <div className="p-3 rounded-2xl bg-white/5 border border-black/5 dark:border-white/5 flex items-center justify-between text-[10px] font-black uppercase tracking-widest">
+                            <span className="text-slate-600">INTERNATIONAL</span>
+                            <span className="text-slate-900 dark:text-white">shopora.com/en</span>
+                            <span className="text-brand-500/50">HÉBERGÉ</span>
                         </div>
                     </div>
-                    <div className="pt-4 flex justify-end gap-3 border-t">
-                        <button
-                            type="button"
-                            onClick={() => setIsModalOpen(false)}
-                            className="px-4 py-2 border border-slate-300 rounded-md text-sm font-medium text-slate-700 hover:bg-slate-50"
-                        >
-                            Annuler
-                        </button>
-                        <button
-                            type="submit"
-                            className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-slate-800"
-                        >
-                            <Save className="h-4 w-4" />
-                            Créer le marché
-                        </button>
-                    </div>
-                </form>
-            </Modal>
+                </PremiumCard>
+            </div>
         </div>
     );
 }

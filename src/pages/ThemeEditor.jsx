@@ -44,7 +44,7 @@ export default function ThemeEditor() {
         }
     };
 
-    if (loading) return <div className="p-12 flex justify-center"><Loader2 className="h-8 w-8 text-slate-400 animate-spin" /></div>;
+    if (loading) return <div className="p-12 flex justify-center"><Loader2 className="h-8 w-8 text-slate-600 dark:text-slate-400 animate-spin" /></div>;
     if (!theme) return <div className="p-12 text-center text-red-500">Thème non trouvé.</div>;
 
     return (
@@ -58,14 +58,14 @@ export default function ThemeEditor() {
                         <ArrowLeft className="h-5 w-5 text-slate-600" />
                     </button>
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900">Éditeur : {theme.name}</h1>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Éditeur : {theme.name}</h1>
                         <p className="text-slate-500 text-sm">Modifiez directement la configuration JSON de votre thème.</p>
                     </div>
                 </div>
                 <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="flex items-center gap-2 bg-slate-900 text-white px-6 py-2 rounded-md text-sm font-bold hover:bg-slate-800 disabled:opacity-50 transition-colors"
+                    className="flex items-center gap-2 bg-brand-600 text-white px-6 py-2 rounded-md text-sm font-bold hover:bg-brand-700 disabled:opacity-50 transition-colors"
                 >
                     {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                     Enregistrer les modifications
@@ -87,7 +87,7 @@ export default function ThemeEditor() {
                         <textarea
                             value={settingsText}
                             onChange={(e) => setSettingsText(e.target.value)}
-                            className="flex-1 w-full p-4 font-mono text-sm bg-slate-900 text-green-400 focus:outline-none resize-none leading-relaxed"
+                            className="flex-1 w-full p-4 font-mono text-sm bg-slate-900 text-brand-400 focus:outline-none resize-none leading-relaxed"
                             spellCheck="false"
                         />
                     </div>
