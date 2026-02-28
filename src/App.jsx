@@ -10,13 +10,30 @@ import Finances from './pages/Finances';
 import Analytics from './pages/Analytics';
 import Themes from './pages/Themes';
 import ThemeEditor from './pages/ThemeEditor';
+import Products from './pages/Products';
+import Orders from './pages/Orders';
+import Metaobjects from './pages/Metaobjects';
+import Storefront from './pages/Storefront';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Layout />}>
+        <Route path="/store" element={<Storefront />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/" element={
+          <ProtectedRoute>
+            <Layout />
+          </ProtectedRoute>
+        }>
           <Route index element={<Dashboard />} />
+          <Route path="products" element={<Products />} />
+          <Route path="orders" element={<Orders />} />
+          <Route path="metaobjects" element={<Metaobjects />} />
           <Route path="settings" element={<Settings />} />
           <Route path="markets" element={<Markets />} />
           <Route path="catalogues" element={<Catalogues />} />

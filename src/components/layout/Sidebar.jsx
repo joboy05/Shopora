@@ -12,7 +12,8 @@ import {
     Monitor,
     Palette,
     Settings,
-    Layout
+    Layout,
+    Database
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
@@ -20,6 +21,7 @@ const navigation = [
     { name: 'Accueil', href: '/', icon: Home },
     { name: 'Commandes', href: '/orders', icon: ShoppingCart },
     { name: 'Produits', href: '/products', icon: Package },
+    { name: 'Contenu (Meta)', href: '/metaobjects', icon: Database },
     { name: 'Clients', href: '/customers', icon: Users },
     { name: 'Réductions', href: '/discounts', icon: Tag },
     { name: 'Markets', href: '/markets', icon: Globe },
