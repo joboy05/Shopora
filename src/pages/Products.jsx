@@ -1,258 +1,313 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Package, MoreHorizontal, CheckCircle2, XCircle, Save, Loader2, Tag } from 'lucide-react';
-import { Modal } from '../components/Modal';
-import { productService, marketService } from '../lib/api';
+import { Package, Plus, Search, Filter, MoreHorizontal, Loader2, AlertTriangle, CheckCircle2, X } from 'lucide-react';
+import { productService } from '../lib/api';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+
+const STATUS_STYLES = {
+    active: 'bg-brand-500/10 text-brand-400 border-brand-500/20',
+    draft: 'bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20',
+    archived: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
+};
+
+const STATUS_LABELS = { active: 'Actif', draft: 'Brouillon', archived: 'Archivé' };
 
 export default function Products() {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const navigate = useNavigate();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [stores, setStores] = useState([]); // In a real app, this would be the current store context
-    const [formData, setFormData] = useState({ 
-        name: '', 
-        description: '', 
-        status: 'draft',
-        price: '',
-        inventoryQuantity: '0',
-        tags: ''
+    const [search, setSearch] = useState('');
+    const [status, setStatus] = useState('');
+    const [meta, setMeta] = useState({ total: 0 });
+
+    const [showModal, setShowModal] = useState(false);
+    const [newProduct, setNewProduct] = useState({
+        name: '', description: '', price: '', status: 'draft', inventory: '0', category: ''
     });
 
-    useEffect(() => {
-        fetchProducts();
-        // Fetch stores to get a valid storeId for creation
-        // Note: In the real app there should be a store context
-    }, []);
-
     const fetchProducts = async () => {
+        setLoading(true);
         try {
-            setLoading(true);
-            const response = await productService.getAll();
-            setProducts(response.data);
-        } catch (error) {
-            console.error('Failed to fetch products:', error);
+            const response = await productService.getAll({ search, status });
+            setProducts(response.data.data);
+            setMeta(response.data.meta || { total: response.data.data.length });
+        } catch (e) {
+            console.error('Failed to load products:', e);
         } finally {
             setLoading(false);
         }
     };
 
-    const handleSubmit = async (e) => {
+    useEffect(() => { fetchProducts(); }, [search, status]);
+
+    const handleCreate = async (e) => {
         e.preventDefault();
         try {
-            // Hardcoded storeId for demonstration if none exists
-            // Ideally we'd fetch this from context
-            const storeId = "demonstration-store-id"; 
-            
             await productService.create({
-                ...formData,
-                storeId,
-                price: parseFloat(formData.price),
-                inventoryQuantity: parseInt(formData.inventoryQuantity),
-                tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
-                variants: [
-                    {
-                        price: parseFloat(formData.price),
-                        inventoryQuantity: parseInt(formData.inventoryQuantity),
-                        options: {}
-                    }
-                ]
+                ...newProduct,
+                price: parseFloat(newProduct.price),
+                inventory: parseInt(newProduct.inventory)
             });
-            setIsModalOpen(false);
+            setShowModal(false);
             fetchProducts();
-            setFormData({ name: '', description: '', status: 'draft', price: '', inventoryQuantity: '0', tags: '' });
-        } catch (error) {
-            console.error('Failed to create product:', error);
-            alert('Erreur lors de la création du produit. Assurez-vous que le serveur est lancé et la DB accessible.');
+            setNewProduct({ name: '', description: '', price: '', status: 'draft', inventory: '0', category: '' });
+        } catch (e) {
+            alert('Échec de la création');
         }
     };
 
+    const stats = [
+        { label: 'Articles actifs', value: products.filter(p => p.status === 'active').length, icon: Package, color: 'text-brand-400', bg: 'bg-brand-500/10' },
+        { label: 'En rupture', value: products.filter(p => p.inventory <= 0).length, icon: AlertTriangle, color: 'text-rose-400', bg: 'bg-rose-500/10' },
+        { label: 'Brouillons', value: products.filter(p => p.status === 'draft').length, icon: CheckCircle2, color: 'text-slate-400', bg: 'bg-slate-500/10' },
+    ];
+
     return (
-        <div className="space-y-6">
-            <header className="flex items-center justify-between">
+        <div className="space-y-8 pb-20">
+            <div className="flex items-end justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900">Produits</h1>
-                    <p className="text-slate-500">Gérez votre inventaire, vos prix et vos variantes.</p>
+                    <h1 className="page-title text-4xl font-black text-slate-900 dark:text-white tracking-tighter">Produits</h1>
+                    <p className="page-subtitle text-slate-500 font-medium">{meta.total} produit{meta.total !== 1 ? 's' : ''} dans votre catalogue.</p>
                 </div>
                 <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-slate-800 transition-colors"
+                    onClick={() => setShowModal(true)}
+                    className="premium-button flex items-center gap-2 bg-slate-900 text-white dark:bg-brand-500 dark:text-black px-6 py-3 rounded-2xl font-black text-sm shadow-[0_10px_30px_rgba(167,139,250,0.3)] transition-all hover:scale-105"
                 >
                     <Plus className="h-4 w-4" />
                     Ajouter un produit
                 </button>
-            </header>
-
-            <div className="bg-white rounded-lg border border-slate-200 shadow-sm">
-                <div className="p-4 border-b border-slate-200 bg-slate-50/50 flex items-center gap-4">
-                    <div className="relative flex-1 max-w-sm">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input
-                            type="text"
-                            placeholder="Rechercher un produit..."
-                            className="w-full pl-10 pr-4 py-2 rounded-md border border-slate-300 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none"
-                        />
-                    </div>
-                </div>
-
-                <div className="overflow-x-auto">
-                    {loading ? (
-                        <div className="p-12 flex justify-center">
-                            <Loader2 className="h-8 w-8 text-slate-400 animate-spin" />
-                        </div>
-                    ) : (
-                        <table className="w-full text-left">
-                            <thead className="bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                <tr>
-                                    <th className="px-6 py-4">Produit</th>
-                                    <th className="px-6 py-4">Statut</th>
-                                    <th className="px-6 py-4">Stock</th>
-                                    <th className="px-6 py-4">Type / Tags</th>
-                                    <th className="px-6 py-4 text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-200">
-                                {products.map((product) => (
-                                    <tr key={product.id} className="hover:bg-slate-50 transition-colors">
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="h-10 w-10 rounded border border-slate-200 bg-slate-50 flex items-center justify-center text-slate-400">
-                                                    <Package className="h-5 w-5" />
-                                                </div>
-                                                <div>
-                                                    <div className="font-medium text-slate-900">{product.name}</div>
-                                                    <div className="text-xs text-slate-500">{product.variants?.length || 0} variantes</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                                product.status === 'active' ? 'bg-green-100 text-green-800' : 
-                                                product.status === 'draft' ? 'bg-slate-100 text-slate-800' : 'bg-red-100 text-red-800'
-                                            }`}>
-                                                {product.status === 'active' ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
-                                                {product.status === 'active' ? 'Actif' : product.status === 'draft' ? 'Brouillon' : 'Archivé'}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 text-sm text-slate-600">
-                                            {product.variants?.reduce((acc, v) => acc + v.inventoryQuantity, 0) || 0} en stock
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex flex-wrap gap-1">
-                                                {product.tags?.map(tag => (
-                                                    <span key={tag} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700">
-                                                        <Tag className="mr-1 h-3 w-3" />
-                                                        {tag}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <button className="text-slate-400 hover:text-slate-600">
-                                                <MoreHorizontal className="h-5 w-5" />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {products.length === 0 && (
-                                    <tr>
-                                        <td colSpan="5" className="px-6 py-12 text-center text-slate-500">
-                                            Aucun produit trouvé.
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    )}
-                </div>
             </div>
 
-            <Modal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                title="Ajouter un nouveau produit"
-            >
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700">Nom du produit</label>
-                        <input
-                            type="text"
-                            required
-                            value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            placeholder="Ex: T-shirt en coton bio"
-                            className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm border p-2"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700">Description</label>
-                        <textarea
-                            value={formData.description}
-                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                            rows={3}
-                            className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm border p-2"
-                        />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700">Prix (€)</label>
-                            <input
-                                type="number"
-                                step="0.01"
-                                required
-                                value={formData.price}
-                                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                                className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm border p-2"
-                            />
+            {/* Quick Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {stats.map(({ label, value, icon: Icon, color, bg }) => (
+                    <div key={label} className="glass rounded-2xl p-5 flex items-center gap-4 border border-white/5 bg-white/5 backdrop-blur-md">
+                        <div className={`p-3 rounded-xl ${bg}`}>
+                            <Icon className={`h-5 w-5 ${color}`} />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-slate-700">Quantité en stock</label>
-                            <input
-                                type="number"
-                                required
-                                value={formData.inventoryQuantity}
-                                onChange={(e) => setFormData({ ...formData, inventoryQuantity: e.target.value })}
-                                className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm border p-2"
-                            />
+                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{label}</p>
+                            <p className={`text-xl font-black ${color}`}>{value}</p>
                         </div>
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700">Tags (séparés par des virgules)</label>
+                ))}
+            </div>
+
+            {/* Table Section */}
+            <div className="section-card bg-white/5 backdrop-blur-md rounded-3xl border border-white/5 overflow-hidden shadow-xl">
+                <div className="section-card-header p-6 flex items-center gap-4 bg-white/5">
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                         <input
-                            type="text"
-                            value={formData.tags}
-                            onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                            placeholder="Vêtements, Été, Bio"
-                            className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm border p-2"
+                            placeholder="Rechercher un produit..."
+                            className="bg-white/5 border border-white/10 rounded-2xl py-2 pl-10 pr-4 text-sm text-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500/20 w-full"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
                         />
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700">Statut initial</label>
-                        <select
-                            value={formData.status}
-                            onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                            className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm border p-2 bg-white w-full"
-                        >
-                            <option value="draft">Brouillon</option>
-                            <option value="active">Actif</option>
-                        </select>
+                    <select
+                        className="bg-white/5 border border-white/10 rounded-2xl px-4 py-2 text-xs font-bold text-slate-400 focus:outline-none"
+                        value={status}
+                        onChange={(e) => setStatus(e.target.value)}
+                    >
+                        <option value="">Tous les statuts</option>
+                        <option value="active">Actifs</option>
+                        <option value="draft">Brouillons</option>
+                        <option value="archived">Archivés</option>
+                    </select>
+                </div>
+
+                {loading ? (
+                    <div className="flex justify-center py-20">
+                        <Loader2 className="h-8 w-8 text-brand-500 animate-spin" />
                     </div>
-                    <div className="pt-4 flex justify-end gap-3 border-t">
-                        <button
-                            type="button"
-                            onClick={() => setIsModalOpen(false)}
-                            className="px-4 py-2 border border-slate-300 rounded-md text-sm font-medium text-slate-700 hover:bg-slate-50"
-                        >
-                            Annuler
-                        </button>
-                        <button
-                            type="submit"
-                            className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-slate-800"
-                        >
-                            <Save className="h-4 w-4" />
-                            Enregistrer le produit
+                ) : products.length === 0 ? (
+                    <div className="py-20 flex flex-col items-center">
+                        <div className="h-16 w-16 glass rounded-2xl flex items-center justify-center mb-4 border border-white/5">
+                            <Package className="h-8 w-8 text-slate-600" />
+                        </div>
+                        <p className="text-slate-600 dark:text-slate-400 font-bold text-lg">Aucun produit trouvé</p>
+                        <button onClick={() => setShowModal(true)} className="text-brand-400 font-bold mt-2 hover:underline">
+                            Créer votre premier article
                         </button>
                     </div>
-                </form>
-            </Modal>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <thead className="bg-white/5">
+                                <tr className="border-b border-white/5">
+                                    <th className="px-6 py-4 text-left text-[10px] font-black text-slate-500 uppercase tracking-widest w-12"></th>
+                                    <th className="px-6 py-4 text-left text-[10px] font-black text-slate-500 uppercase tracking-widest">Produit</th>
+                                    <th className="px-6 py-4 text-left text-[10px] font-black text-slate-500 uppercase tracking-widest">Statut</th>
+                                    <th className="px-6 py-4 text-left text-[10px] font-black text-slate-500 uppercase tracking-widest">Inventaire</th>
+                                    <th className="px-6 py-4 text-left text-[10px] font-black text-slate-500 uppercase tracking-widest">Catégorie</th>
+                                    <th className="px-6 py-4 text-left text-[10px] font-black text-slate-500 uppercase tracking-widest">Prix</th>
+                                    <th className="px-6 py-4 text-right"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <AnimatePresence mode="popLayout">
+                                    {products.map((product, i) => (
+                                        <motion.tr
+                                            key={product.id}
+                                            initial={{ opacity: 0, x: -10 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            exit={{ opacity: 0, x: 10 }}
+                                            transition={{ delay: i * 0.05 }}
+                                            onClick={() => navigate(`/products/${product.id}`)}
+                                            className="hover:bg-white/5 border-b border-white/5 cursor-pointer transition-colors"
+                                        >
+                                            <td className="px-6 py-4">
+                                                <div className="h-10 w-10 glass rounded-xl overflow-hidden flex items-center justify-center border border-white/5">
+                                                    {product.images?.[0] ? (
+                                                        <img src={product.images[0].url} alt="" className="h-full w-full object-cover" />
+                                                    ) : <Package className="h-5 w-5 text-slate-500" />}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div>
+                                                    <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">{product.name}</p>
+                                                    <p className="text-[10px] text-slate-500 truncate max-w-[200px]">{product.description}</p>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className={`px-2 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${STATUS_STYLES[product.status] || STATUS_STYLES.draft}`}>
+                                                    {STATUS_LABELS[product.status] || product.status}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                                                    {product.inventory} en stock
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className="text-xs font-bold text-slate-500">{product.category || 'Non classé'}</span>
+                                            </td>
+                                            <td className="px-6 py-4 text-sm font-black text-slate-900 dark:text-white">
+                                                {product.price?.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
+                                            </td>
+                                            <td className="px-6 py-4 text-right">
+                                                <button className="p-2 rounded-xl hover:bg-white/5 text-slate-500 hover:text-white transition-all">
+                                                    <MoreHorizontal className="h-4 w-4" />
+                                                </button>
+                                            </td>
+                                        </motion.tr>
+                                    ))}
+                                </AnimatePresence>
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </div>
+
+            {/* Create Modal */}
+            <AnimatePresence>
+                {showModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+                        <motion.div
+                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                            onClick={() => setShowModal(false)}
+                            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                        />
+                        <motion.div
+                            initial={{ scale: 0.95, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.95, opacity: 0, y: 20 }}
+                            className="relative w-full max-w-2xl bg-slate-900 rounded-[2.5rem] border border-white/10 p-10 overflow-hidden shadow-2xl"
+                        >
+                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-400 to-brand-600" />
+
+                            <div className="flex items-center justify-between mb-8">
+                                <div>
+                                    <h2 className="text-3xl font-black text-white tracking-tighter">NOUVEAU PRODUIT</h2>
+                                    <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-1">Édition du catalogue</p>
+                                </div>
+                                <button onClick={() => setShowModal(false)} className="p-2 hover:bg-white/5 rounded-full transition-colors">
+                                    <X className="h-6 w-6 text-slate-500" />
+                                </button>
+                            </div>
+
+                            <form onSubmit={handleCreate} className="space-y-6">
+                                <div className="grid grid-cols-2 gap-6">
+                                    <div className="col-span-2 space-y-2">
+                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Nom de l'article</label>
+                                        <input
+                                            required placeholder="Ex: Veste Premium en Cuir"
+                                            className="bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white w-full focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                                            value={newProduct.name}
+                                            onChange={e => setNewProduct({ ...newProduct, name: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="col-span-2 space-y-2">
+                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Description</label>
+                                        <textarea
+                                            rows={3} placeholder="Détails du produit..."
+                                            className="bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white w-full focus:outline-none focus:ring-2 focus:ring-brand-500/20 resize-none"
+                                            value={newProduct.description}
+                                            onChange={e => setNewProduct({ ...newProduct, description: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Prix (€)</label>
+                                        <input
+                                            type="number" step="0.01" required placeholder="0.00"
+                                            className="bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white w-full focus:outline-none focus:ring-2 focus:ring-brand-500/20 font-black"
+                                            value={newProduct.price}
+                                            onChange={e => setNewProduct({ ...newProduct, price: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Stock</label>
+                                        <input
+                                            type="number" required placeholder="0"
+                                            className="bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white w-full focus:outline-none focus:ring-2 focus:ring-brand-500/20 font-black"
+                                            value={newProduct.inventory}
+                                            onChange={e => setNewProduct({ ...newProduct, inventory: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Catégorie</label>
+                                        <input
+                                            placeholder="Ex: Vêtements"
+                                            className="bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white w-full focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                                            value={newProduct.category}
+                                            onChange={e => setNewProduct({ ...newProduct, category: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Statut</label>
+                                        <select
+                                            className="bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white w-full focus:outline-none focus:ring-2 focus:ring-brand-500/20 font-bold appearance-none"
+                                            value={newProduct.status}
+                                            onChange={e => setNewProduct({ ...newProduct, status: e.target.value })}
+                                        >
+                                            <option value="draft" className="bg-slate-900">Brouillon</option>
+                                            <option value="active" className="bg-slate-900">Actif</option>
+                                            <option value="archived" className="bg-slate-900">Archivé</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="pt-6 flex gap-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowModal(false)}
+                                        className="flex-1 py-4 px-6 rounded-2xl border border-white/5 font-black text-xs text-slate-500 hover:bg-white/5 transition-all"
+                                    >
+                                        ANNULER
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="flex-[2] bg-brand-500 text-black py-4 px-6 rounded-2xl font-black text-xs shadow-[0_10px_30px_rgba(167,139,250,0.3)] hover:scale-[1.02] transition-all"
+                                    >
+                                        CRÉER L'ARTICLE
+                                    </button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

@@ -51,10 +51,10 @@ export default function Themes() {
         <div className="space-y-6">
             <header className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900">Thèmes</h1>
+                    <h1 className="text-2xl font-bold">Thèmes</h1>
                     <p className="text-slate-500">Gérez l'apparence de votre boutique en ligne.</p>
                 </div>
-                <button className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-slate-800 transition-colors">
+                <button className="flex items-center gap-2 bg-brand-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-brand-700 transition-colors">
                     <Plus className="h-4 w-4" />
                     Ajouter un thème
                 </button>
@@ -62,22 +62,22 @@ export default function Themes() {
 
             {loading ? (
                 <div className="p-12 flex justify-center">
-                    <Loader2 className="h-8 w-8 text-slate-400 animate-spin" />
+                    <Loader2 className="h-8 w-8 text-slate-600 dark:text-slate-400 animate-spin" />
                 </div>
             ) : (
                 <div className="space-y-8">
                     {/* Current Theme Card */}
                     {currentTheme ? (
-                        <div className="bg-white rounded-lg border-2 border-green-500 shadow-sm overflow-hidden">
+                        <div className="bg-white rounded-lg border-2 border-brand-500 shadow-sm overflow-hidden">
                             <div className="flex flex-col md:flex-row">
                                 <div className="md:w-1/3 aspect-[4/3] bg-slate-100 flex items-center justify-center border-r border-slate-200">
-                                    <Monitor className="h-20 w-20 text-slate-300" />
+                                    <Monitor className="h-20 w-20 text-slate-700 dark:text-slate-300" />
                                 </div>
                                 <div className="flex-1 p-6 flex flex-col justify-between">
                                     <div>
                                         <div className="flex items-center gap-2 mb-1">
                                             <h3 className="text-xl font-bold text-slate-900">{currentTheme.name}</h3>
-                                            <span className="bg-green-100 text-green-700 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full flex items-center gap-1">
+                                            <span className="bg-brand-500/10 text-brand-400 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full flex items-center gap-1">
                                                 <CheckCircle2 className="h-3 w-3" />
                                                 Thème publié
                                             </span>
@@ -87,7 +87,7 @@ export default function Themes() {
                                     <div className="flex items-center gap-3 mt-6">
                                         <button
                                             onClick={() => navigate(`/online-store/themes/${currentTheme.id}/edit`)}
-                                            className="flex-1 bg-slate-900 text-white px-4 py-2 rounded-md text-sm font-bold hover:bg-slate-800 transition-colors"
+                                            className="flex-1 bg-brand-600 text-white px-4 py-2 rounded-md text-sm font-bold hover:bg-brand-700 transition-colors"
                                         >
                                             Personnaliser
                                         </button>
@@ -99,8 +99,8 @@ export default function Themes() {
                             </div>
                         </div>
                     ) : (
-                        <div className="bg-white p-12 rounded-lg border border-dashed border-slate-300 text-center">
-                            <Palette className="h-12 w-12 text-slate-300 mx-auto mb-4" />
+                        <div className="bg-white dark:bg-slate-900/40 p-12 rounded-lg border border-dashed border-slate-300 dark:border-white/10 text-center">
+                            <Palette className="h-12 w-12 text-slate-700 dark:text-slate-300 mx-auto mb-4" />
                             <h3 className="text-lg font-medium text-slate-900">Aucun thème publié</h3>
                             <p className="text-slate-500 mt-1">Publiez un thème pour commencer à personnaliser votre boutique.</p>
                         </div>
@@ -132,20 +132,20 @@ export default function Themes() {
                                                 <div className="flex justify-end gap-2">
                                                     <button
                                                         onClick={() => handlePublish(theme.id)}
-                                                        className="text-green-600 hover:text-green-700 text-sm font-bold flex items-center gap-1"
+                                                        className="text-brand-600 hover:text-brand-700 text-sm font-bold flex items-center gap-1"
                                                     >
                                                         <Play className="h-3 w-3" />
                                                         Publier
                                                     </button>
                                                     <button
                                                         onClick={() => navigate(`/online-store/themes/${theme.id}/edit`)}
-                                                        className="text-slate-400 hover:text-slate-600"
+                                                        className="text-slate-600 dark:text-slate-400 hover:text-slate-600"
                                                     >
                                                         <SettingsIcon className="h-4 w-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDelete(theme.id)}
-                                                        className="text-slate-400 hover:text-red-600"
+                                                        className="text-slate-600 dark:text-slate-400 hover:text-red-600"
                                                     >
                                                         <Trash2 className="h-4 w-4" />
                                                     </button>

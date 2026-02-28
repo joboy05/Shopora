@@ -46,16 +46,25 @@ export const themeService = {
 };
 
 export const productService = {
-    getAll: () => api.get('/products'),
-    getById: (id) => api.get(`/products/${id}`),
+    getAll: (params) => api.get('/products', { params }),
+    getOne: (id) => api.get(`/products/${id}`),
     create: (data) => api.post('/products', data),
-    update: (id, data) => api.patch(`/products/${id}`, data),
-    delete: (id) => api.delete(`/products/${id}`)
+    update: (id, data) => api.put(`/products/${id}`, data),
+    delete: (id) => api.delete(`/products/${id}`),
 };
 
 export const orderService = {
-    getAll: () => api.get('/orders'),
-    create: (data) => api.post('/orders', data)
+    getAll: (params) => api.get('/orders', { params }),
+    getOne: (id) => api.get(`/orders/${id}`),
+    getStats: () => api.get('/orders/stats'),
+    updateStatus: (id, data) => api.patch(`/orders/${id}/status`, data),
+};
+
+export const customerService = {
+    getAll: (params) => api.get('/customers', { params }),
+    getOne: (id) => api.get(`/customers/${id}`),
+    create: (data) => api.post('/customers', data),
+    update: (id, data) => api.put(`/customers/${id}`, data),
 };
 
 export const metaService = {

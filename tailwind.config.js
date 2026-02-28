@@ -1,3 +1,5 @@
+import colors from 'tailwindcss/colors';
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -7,6 +9,20 @@ export default {
   theme: {
     extend: {
       colors: {
+        // --- 🎨 CONFIGURATION DES COULEURS SHOPORA ---
+        // Changez simplement 'violet' par 'blue', 'emerald', 'sky', 'rose', etc.
+        // pour changer la couleur principale de toute l'application !
+        brand: colors.violet,
+
+        /* Suggestions :
+           brand: colors.blue,
+           brand: colors.emerald,
+           brand: colors.rose,
+           brand: colors.sky,
+           brand: colors.orange,
+        */
+        // ---------------------------------------------
+
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
