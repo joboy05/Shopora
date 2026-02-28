@@ -29,10 +29,12 @@ export default function Products() {
         setLoading(true);
         try {
             const response = await productService.getAll({ search, status });
-            setProducts(response.data.data);
-            setMeta(response.data.meta || { total: response.data.data.length });
+            const data = response.data?.data || [];
+            setProducts(Array.isArray(data) ? data : []);
+            setMeta(response.data?.meta || { total: Array.isArray(data) ? data.length : 0 });
         } catch (e) {
             console.error('Failed to load products:', e);
+            setProducts([]);
         } finally {
             setLoading(false);
         }
@@ -57,9 +59,9 @@ export default function Products() {
     };
 
     const stats = [
-        { label: 'Articles actifs', value: products.filter(p => p.status === 'active').length, icon: Package, color: 'text-brand-400', bg: 'bg-brand-500/10' },
-        { label: 'En rupture', value: products.filter(p => p.inventory <= 0).length, icon: AlertTriangle, color: 'text-rose-400', bg: 'bg-rose-500/10' },
-        { label: 'Brouillons', value: products.filter(p => p.status === 'draft').length, icon: CheckCircle2, color: 'text-slate-400', bg: 'bg-slate-500/10' },
+        { label: 'Articles actifs', value: (products || []).filter(p => p?.status === 'active').length, icon: Package, color: 'text-brand-400', bg: 'bg-brand-500/10' },
+        { label: 'En rupture', value: (products || []).filter(p => p?.inventory <= 0).length, icon: AlertTriangle, color: 'text-rose-400', bg: 'bg-rose-500/10' },
+        { label: 'Brouillons', value: (products || []).filter(p => p?.status === 'draft').length, icon: CheckCircle2, color: 'text-slate-400', bg: 'bg-slate-500/10' },
     ];
 
     return (
@@ -147,7 +149,7 @@ export default function Products() {
                             </thead>
                             <tbody>
                                 <AnimatePresence mode="popLayout">
-                                    {products.map((product, i) => (
+                                    {(products || []).map((product, i) => (
                                         <motion.tr
                                             key={product.id}
                                             initial={{ opacity: 0, x: -10 }}

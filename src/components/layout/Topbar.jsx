@@ -1,10 +1,16 @@
-import React from 'react';
-import { Search, Bell, Sun, Moon } from 'lucide-react';
+import { Search, Bell, Sun, Moon, LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
 
 export default function Topbar() {
     const { theme, toggleTheme } = useTheme();
+    const navigate = useNavigate();
+    
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        navigate('/login');
+    };
 
     return (
         <motion.header
@@ -41,13 +47,22 @@ export default function Topbar() {
 
                 <div className="flex items-center gap-4">
                     <div className="text-right hidden sm:block">
-                        <p className="text-sm font-black text-slate-900 dark:text-white leading-none">Admin Shopora</p>
-                        <p className="text-[10px] font-bold text-brand-500 tracking-wider uppercase mt-1">Propriétaire</p>
+                        <p className="text-sm font-black text-slate-900 dark:text-white leading-none">Mon Espace</p>
+                        <p className="text-[10px] font-bold text-brand-500 tracking-wider uppercase mt-1">Administrateur</p>
                     </div>
-                    <div className="h-10 w-10 rounded-2xl bg-gradient-to-tr from-brand-400/20 to-brand-500/20 border border-black/10 dark:border-white/10 flex items-center justify-center cursor-pointer hover:scale-110 transition-transform duration-300">
-                        <div className="h-8 w-8 rounded-xl bg-slate-900 flex items-center justify-center text-xs font-black text-white">
-                            JD
+                    <div className="flex items-center gap-2 group/user cursor-pointer">
+                        <div className="h-10 w-10 rounded-2xl bg-gradient-to-tr from-brand-400/20 to-brand-500/20 border border-black/10 dark:border-white/10 flex items-center justify-center hover:scale-110 transition-transform duration-300">
+                            <div className="h-8 w-8 rounded-xl bg-slate-900 flex items-center justify-center text-xs font-black text-white">
+                                AD
+                            </div>
                         </div>
+                        <button 
+                            onClick={handleLogout}
+                            className="p-2.5 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-500 hover:bg-rose-500 hover:text-white transition-all duration-300"
+                            title="Se déconnecter"
+                        >
+                            <LogOut className="h-4 w-4" />
+                        </button>
                     </div>
                 </div>
             </div>

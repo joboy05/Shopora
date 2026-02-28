@@ -33,10 +33,12 @@ export default function Orders() {
                 orderService.getAll({ search, status: statusFilter }),
                 orderService.getStats(),
             ]);
-            setOrders(ordersRes.data.data);
-            setStats(statsRes.data.data);
+            setOrders(ordersRes.data?.data || []);
+            setStats(statsRes.data?.data || null);
         } catch (e) {
             console.error('Failed to load orders:', e);
+            setOrders([]);
+            setStats(null);
         } finally {
             setLoading(false);
         }
@@ -76,7 +78,7 @@ export default function Orders() {
             )}
 
             {/* Revenue Banner */}
-            {stats && (
+            {stats && typeof stats.revenue === 'number' && (
                 <div className="glass rounded-3xl p-6 flex items-center justify-between border border-brand-500/10"
                     style={{ background: 'linear-gradient(135deg, rgba(52,211,153,0.05) 0%, transparent 100%)' }}>
                     <div>
@@ -131,7 +133,7 @@ export default function Orders() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {orders.map((order) => {
+                                {(orders || []).map((order) => {
                                     const sc = STATUS_CONFIG[order.status] || { label: order.status, style: '' };
                                     const pc = PAYMENT_CONFIG[order.paymentStatus] || { label: order.paymentStatus, style: '' };
                                     return (
@@ -172,6 +174,7 @@ export default function Orders() {
                         </table>
                     </div>
                 )}
+            </div>
         </div>
     );
 }
