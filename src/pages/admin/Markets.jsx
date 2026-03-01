@@ -1,6 +1,6 @@
 import React from 'react';
 import { Globe, MapPin, Plus, MoreHorizontal, TrendingUp, ShoppingBag, ArrowRight } from 'lucide-react';
-import { PremiumCard } from '../components/ui/PremiumCard';
+import { PremiumCard } from '../../components/ui/PremiumCard';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const markets = [

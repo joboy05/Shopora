@@ -14,12 +14,12 @@ const menuItems = [
     { icon: Package, label: 'Produits', path: '/products' },
     { icon: Users, label: 'Clients', path: '/customers' },
     { icon: Tag, label: 'Réductions', path: '/discounts' },
-    { icon: Database, label: 'Metaobjects', path: '/metaobjects' },
-    { type: 'divider', label: 'Configuration' },
-    { icon: Globe, label: 'Markets', path: '/markets' },
-    { icon: LayoutGrid, label: 'Catalogues', path: '/catalogues' },
-    { icon: CreditCard, label: 'Finances', path: '/finances' },
-    { icon: BarChart2, label: 'Analyses', path: '/analytics' },
+    { icon: Database, label: 'Metaobjects', path: '/metaobjects', proOnly: true },
+    { type: 'divider', label: 'Configuration', proOnly: true },
+    { icon: Globe, label: 'Markets', path: '/markets', proOnly: true },
+    { icon: LayoutGrid, label: 'Catalogues', path: '/catalogues', proOnly: true },
+    { icon: CreditCard, label: 'Finances', path: '/finances', proOnly: true },
+    { icon: BarChart2, label: 'Analyses', path: '/analytics', proOnly: true },
     { type: 'divider', label: 'Boutique en ligne' },
     { icon: Palette, label: 'Thèmes', path: '/online-store/themes' },
     { icon: Monitor, label: 'Pages', path: '/online-store/pages' },
@@ -28,6 +28,11 @@ const menuItems = [
 ];
 
 export default function Sidebar() {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const isPro = user.accountType === 'COMPANY';
+
+    const filteredItems = menuItems.filter(item => !item.proOnly || isPro);
+
     return (
         <motion.aside
             initial={{ x: -280 }}
@@ -46,7 +51,7 @@ export default function Sidebar() {
 
             <nav className="flex-1 overflow-y-auto px-4 pb-8 custom-scrollbar">
                 <ul className="space-y-1.5">
-                    {menuItems.map((item, index) => {
+                    {filteredItems.map((item, index) => {
                         if (item.type === 'divider') {
                             return (
                                 <li key={`divider-${index}`} className="pt-6 pb-2 px-4">

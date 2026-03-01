@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Tag, HelpCircle, Save, Loader2, CheckCircle2, XCircle, MoreHorizontal } from 'lucide-react';
-import { Modal } from '../components/Modal';
-import { catalogService, marketService } from '../lib/api';
+import { Modal } from '../../components/Modal';
+import { catalogService, marketService } from '../../lib/api';
 
 export default function Catalogues() {
     const [isModalOpen, setIsModalOpen] = useState(false);

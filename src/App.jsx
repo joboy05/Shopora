@@ -1,24 +1,38 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Dashboard from './pages/Dashboard';
-import Markets from './pages/Markets';
-import Catalogues from './pages/Catalogues';
-import Finances from './pages/Finances';
-import Analytics from './pages/Analytics';
-import Products from './pages/Products';
-import ProductDetail from './pages/ProductDetail';
-import Orders from './pages/Orders';
-import OrderDetail from './pages/OrderDetail';
-import Customers from './pages/Customers';
-import CustomerDetail from './pages/CustomerDetail';
-import Settings from './pages/Settings';
-import Themes from './pages/Themes';
-import ThemeEditor from './pages/ThemeEditor';
-import Pages from './pages/Pages';
-import Metaobjects from './pages/Metaobjects';
-import Storefront from './pages/Storefront';
-import Login from './pages/Login';
-import Register from './pages/Register';
+
+// Auth
+import Login from './pages/auth/Login';
+import Register from './pages/auth/Register';
+
+// Admin
+import Dashboard from './pages/admin/Dashboard';
+import Analytics from './pages/admin/Analytics';
+import Finances from './pages/admin/Finances';
+import Markets from './pages/admin/Markets';
+import Catalogues from './pages/admin/Catalogues';
+import Metaobjects from './pages/admin/Metaobjects';
+import Settings from './pages/admin/Settings';
+
+// Products
+import Products from './pages/products/Products';
+import ProductDetail from './pages/products/ProductDetail';
+
+// Orders
+import Orders from './pages/orders/Orders';
+import OrderDetail from './pages/orders/OrderDetail';
+
+// Customers
+import Customers from './pages/customers/Customers';
+import CustomerDetail from './pages/customers/CustomerDetail';
+
+// Store (Boutique en ligne)
+import Themes from './pages/store/Themes';
+import ThemeEditor from './pages/store/ThemeEditor';
+import Pages from './pages/store/Pages';
+import Storefront from './pages/store/Storefront';
+
+// Layout & Auth Guards
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { Layout } from './components/layout/Layout';
 import { ThemeProvider } from './context/ThemeContext';

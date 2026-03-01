@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Package, ArrowLeft, Save, Plus, Trash2, Image as ImageIcon, Loader2, ArrowRight } from 'lucide-react';
-import { productService } from '../lib/api';
-import { PremiumCard } from '../components/ui/PremiumCard';
+import { productService } from '../../lib/api';
+import { PremiumCard } from '../../components/ui/PremiumCard';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ProductDetail() {

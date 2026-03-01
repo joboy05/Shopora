@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Package, Plus, Search, Filter, MoreHorizontal, Loader2, AlertTriangle, CheckCircle2, X } from 'lucide-react';
-import { productService } from '../lib/api';
+import { productService } from '../../lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 

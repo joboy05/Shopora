@@ -4,7 +4,7 @@ import {
     LineChart, Line, PieChart, Pie, Cell
 } from 'recharts';
 import { Calendar, Download, Filter, TrendingUp, Users, ShoppingCart, Target } from 'lucide-react';
-import { PremiumCard } from '../components/ui/PremiumCard';
+import { PremiumCard } from '../../components/ui/PremiumCard';
 import { motion } from 'framer-motion';
 
 const salesData = [

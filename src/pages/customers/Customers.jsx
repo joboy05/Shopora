@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Search, Plus, MoreHorizontal, Loader2, ShoppingBag, Mail, Phone, ArrowUpRight } from 'lucide-react';
-import { customerService } from '../lib/api';
-import { PremiumCard } from '../components/ui/PremiumCard';
+import { customerService } from '../../lib/api';
+import { PremiumCard } from '../../components/ui/PremiumCard';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 

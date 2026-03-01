@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ShoppingCart, Search, Loader2, ChevronDown, TrendingUp, Clock, CheckCircle, XCircle, MoreHorizontal } from 'lucide-react';
-import { orderService } from '../lib/api';
+import { orderService } from '../../lib/api';
 
 const STATUS_CONFIG = {
     pending: { label: 'En attente', style: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },

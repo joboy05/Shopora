@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Loader2, User, Mail, Phone, ShoppingBag, MapPin, Tag } from 'lucide-react';
-import { customerService } from '../lib/api';
+import { customerService } from '../../lib/api';
 
 export default function CustomerDetail() {
     const { id } = useParams();

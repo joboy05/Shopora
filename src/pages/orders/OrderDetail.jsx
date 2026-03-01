@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Loader2, User, MapPin, Truck, CreditCard, Clock, CheckCircle, Package, ArrowRight } from 'lucide-react';
-import { orderService } from '../lib/api';
-import { PremiumCard } from '../components/ui/PremiumCard';
+import { orderService } from '../../lib/api';
+import { PremiumCard } from '../../components/ui/PremiumCard';
 import { motion } from 'framer-motion';
 
 const STATUS_CONFIG = {

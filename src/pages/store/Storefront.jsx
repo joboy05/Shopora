@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ShoppingBag, Loader2, Package, Tag, ShoppingCart, X, Check } from 'lucide-react';
-import { productService, orderService } from '../lib/api';
+import { productService, orderService } from '../../lib/api';
 
 export default function Storefront() {
     const [products, setProducts] = useState([]);

@@ -3,7 +3,7 @@ import {
     Monitor, Palette, Eye, Play, Trash2, Plus,
     ChevronRight, Settings as SettingsIcon, Loader2, CheckCircle2
 } from 'lucide-react';
-import { themeService } from '../lib/api';
+import { themeService } from '../../lib/api';
 
 export default function Themes() {
     const [themes, setThemes] = useState([]);

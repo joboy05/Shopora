@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Save, ArrowLeft, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
-import { themeService } from '../lib/api';
+import { themeService } from '../../lib/api';
 
 export default function ThemeEditor() {
     const { id } = useParams();

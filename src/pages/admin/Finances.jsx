@@ -3,7 +3,7 @@ import {
     DollarSign, ArrowUpRight, ArrowDownRight, CreditCard,
     History, Landmark, Briefcase, TrendingUp
 } from 'lucide-react';
-import { PremiumCard } from '../components/ui/PremiumCard';
+import { PremiumCard } from '../../components/ui/PremiumCard';
 import { motion } from 'framer-motion';
 
 const payouts = [

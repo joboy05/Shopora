@@ -76,6 +76,11 @@ export const metaService = {
     createMetafield: (data) => api.post('/meta/metafields', data)
 };
 
+export const storeService = {
+    get: () => api.get('/store'),
+    update: (data) => api.patch('/store', data),
+};
+
 export const authService = {
     login: (data) => api.post('/auth/login', data),
     register: (data) => api.post('/auth/register', data)

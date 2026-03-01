@@ -1,6 +1,6 @@
 import React from 'react';
 import { TrendingUp, Users, ShoppingBag, BarChart2, ArrowUpRight, ArrowDownRight, Package } from 'lucide-react';
-import { PremiumCard } from '../components/ui/PremiumCard';
+import { PremiumCard } from '../../components/ui/PremiumCard';
 import { motion } from 'framer-motion';
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
@@ -24,11 +24,22 @@ const stats = [
 ];
 
 export default function Dashboard() {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const isPro = user.accountType === 'COMPANY';
+    const displayName = isPro ? user.storeName : user.username;
+
     return (
         <div className="space-y-10 pb-20">
             <div className="flex flex-col gap-2">
-                <h1 className="text-4xl font-black tracking-tighter">Tableau de bord</h1>
-                <p className="text-slate-500 font-medium">Bienvenue, voici un aperçu de votre activité aujourd'hui.</p>
+                <div className="flex items-center gap-3">
+                    <h1 className="text-4xl font-black tracking-tighter">Tableau de bord</h1>
+                    {isPro && (
+                        <div className="bg-gradient-to-r from-amber-400 to-orange-500 text-black text-[10px] font-black px-3 py-1 rounded-full shadow-[0_0_15px_rgba(251,191,36,0.3)] uppercase tracking-widest">
+                            Compte Pro
+                        </div>
+                    )}
+                </div>
+                <p className="text-slate-500 font-medium">Bienvenue, <span className="text-brand-400 font-bold">{displayName || 'Marchand'}</span>. Voici un aperçu de votre activité aujourd'hui.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -122,6 +133,42 @@ export default function Dashboard() {
                     </button>
                 </PremiumCard>
             </div>
+
+            {isPro && (
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 }}
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                >
+                    <PremiumCard className="bg-brand-500/5 border-brand-500/10">
+                        <div className="flex items-center gap-3 mb-4 text-brand-400">
+                            <TrendingUp className="h-5 w-5" />
+                            <h3 className="text-sm font-black uppercase tracking-widest">Projection de croissance</h3>
+                        </div>
+                        <p className="text-2xl font-black mb-2">+18.4%</p>
+                        <p className="text-xs text-slate-500 font-medium italic">Basé sur vos performances des 30 derniers jours.</p>
+                    </PremiumCard>
+
+                    <PremiumCard className="bg-brand-500/5 border-brand-500/10">
+                        <div className="flex items-center gap-3 mb-4 text-brand-400">
+                            <Users className="h-5 w-5" />
+                            <h3 className="text-sm font-black uppercase tracking-widest">Fidélité client</h3>
+                        </div>
+                        <p className="text-2xl font-black mb-2">64%</p>
+                        <p className="text-xs text-slate-500 font-medium italic">De vos clients reviennent pour un second achat.</p>
+                    </PremiumCard>
+
+                    <PremiumCard className="bg-brand-500/5 border-brand-500/10">
+                        <div className="flex items-center gap-3 mb-4 text-brand-400">
+                            <Globe className="h-5 w-5" />
+                            <h3 className="text-sm font-black uppercase tracking-widest">Portée du marché</h3>
+                        </div>
+                        <p className="text-2xl font-black mb-2">4 Pays</p>
+                        <p className="text-xs text-slate-500 font-medium italic">Votre boutique est active sur 4 marchés régionaux.</p>
+                    </PremiumCard>
+                </motion.div>
+            )}
         </div>
     );
 }

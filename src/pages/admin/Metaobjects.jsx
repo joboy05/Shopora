@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Database, Settings, FileText, Save, Loader2, ChevronRight, Hash } from 'lucide-react';
-import { metaService } from '../lib/api';
+import { metaService } from '../../lib/api';
 
 export default function Metaobjects() {
     const [definitions, setDefinitions] = useState([]);

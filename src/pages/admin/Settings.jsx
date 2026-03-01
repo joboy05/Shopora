@@ -1,17 +1,51 @@
 import React, { useState } from 'react';
-import { Save, Store, Globe, Mail, Phone, CreditCard, ShieldCheck } from 'lucide-react';
-import { PremiumCard } from '../components/ui/PremiumCard';
+import { Save, Store, Globe, Mail, Phone, CreditCard, ShieldCheck, FileText, Landmark } from 'lucide-react';
+import { PremiumCard } from '../../components/ui/PremiumCard';
 import { motion } from 'framer-motion';
+import { storeService } from '../../lib/api';
 
 export default function Settings() {
     const [formData, setFormData] = useState({
-        storeName: 'Ma Boutique Shopora',
-        email: 'admin@shopora.com',
-        phone: '+33 6 00 00 00 00',
-        currency: 'EUR',
-        timezone: '(GMT+01:00) Paris',
-        unitSystem: 'metric',
+        name: '',
+        email: '',
+        phone: '',
+        legalName: '',
+        siret: '',
+        vatNumber: '',
+        billingAddress: '',
+        defaultCurrency: 'EUR',
     });
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const isPro = user.accountType === 'COMPANY';
+
+    React.useEffect(() => {
+        const fetchStore = async () => {
+            try {
+                const response = await storeService.get();
+                setFormData(response.data.data);
+            } catch (err) {
+                console.error("Erreur lors du chargement des paramètres", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchStore();
+    }, []);
+
+    const handleSave = async () => {
+        setSaving(true);
+        try {
+            await storeService.update(formData);
+            alert("Paramètres enregistrés avec succès !");
+        } catch (err) {
+            alert("Erreur lors de l'enregistrement.");
+        } finally {
+            setSaving(false);
+        }
+    };
 
     return (
         <div className="space-y-10 pb-20 max-w-5xl mx-auto">
@@ -21,9 +55,13 @@ export default function Settings() {
                     <p className="text-slate-500 font-medium">Configurez les informations fondamentales de votre boutique.</p>
                 </div>
 
-                <button className="btn-premium py-3 group">
-                    <Save className="h-4 w-4 group-hover:scale-110 transition-transform" />
-                    Enregistrer tout
+                <button 
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="btn-premium py-3 group"
+                >
+                    <Save className={`h-4 w-4 group-hover:scale-110 transition-transform ${saving ? 'animate-spin' : ''}`} />
+                    {saving ? 'Enregistrement...' : 'Enregistrer tout'}
                 </button>
             </div>
 
@@ -40,8 +78,8 @@ export default function Settings() {
                                     <label className="block text-[10px] font-black text-slate-700 uppercase tracking-widest mb-2">Nom de la boutique</label>
                                     <input
                                         className="bg-white/5 border border-black/5 dark:border-white/5 rounded-2xl py-3 px-4 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 w-full transition-all font-bold"
-                                        value={formData.storeName}
-                                        onChange={e => setFormData({ ...formData, storeName: e.target.value })}
+                                        value={formData.name || ''}
+                                        onChange={e => setFormData({ ...formData, name: e.target.value })}
                                     />
                                 </div>
                                 <div>
@@ -72,7 +110,7 @@ export default function Settings() {
                                         <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600 group-hover:text-brand-400 transition-colors" />
                                         <input
                                             className="bg-white/5 border border-black/5 dark:border-white/5 rounded-2xl py-3 pl-12 pr-4 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 w-full transition-all font-bold"
-                                            value={formData.phone}
+                                            value={formData.phone || ''}
                                             onChange={e => setFormData({ ...formData, phone: e.target.value })}
                                         />
                                     </div>
@@ -80,6 +118,59 @@ export default function Settings() {
                             </div>
                         </div>
                     </PremiumCard>
+
+                    {isPro && (
+                        <PremiumCard delay={0.15}>
+                            <h2 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+                                <Landmark className="h-3 w-3" /> INFORMATIONS LÉGALES
+                            </h2>
+
+                            <div className="space-y-6">
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-700 uppercase tracking-widest mb-2">Raison sociale / Nom légal</label>
+                                    <div className="relative group">
+                                        <FileText className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600 group-hover:text-brand-400 transition-colors" />
+                                        <input
+                                            className="bg-white/5 border border-black/5 dark:border-white/5 rounded-2xl py-3 pl-12 pr-4 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 w-full transition-all font-bold"
+                                            placeholder="Ex: Shopora SAS"
+                                            value={formData.legalName || ''}
+                                            onChange={e => setFormData({ ...formData, legalName: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-[10px] font-black text-slate-700 uppercase tracking-widest mb-2">Numéro SIRET</label>
+                                        <input
+                                            className="bg-white/5 border border-black/5 dark:border-white/5 rounded-2xl py-3 px-4 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 w-full transition-all font-bold"
+                                            placeholder="123 456 789 00010"
+                                            value={formData.siret || ''}
+                                            onChange={e => setFormData({ ...formData, siret: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] font-black text-slate-700 uppercase tracking-widest mb-2">Numéro de TVA</label>
+                                        <input
+                                            className="bg-white/5 border border-black/5 dark:border-white/5 rounded-2xl py-3 px-4 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 w-full transition-all font-bold"
+                                            placeholder="FR 12 345678901"
+                                            value={formData.vatNumber || ''}
+                                            onChange={e => setFormData({ ...formData, vatNumber: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-700 uppercase tracking-widest mb-2">Adresse de facturation</label>
+                                    <textarea
+                                        className="bg-white/5 border border-black/5 dark:border-white/5 rounded-2xl py-3 px-4 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 w-full transition-all font-bold min-h-[100px]"
+                                        value={formData.billingAddress || ''}
+                                        onChange={e => setFormData({ ...formData, billingAddress: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                        </PremiumCard>
+                    )}
 
                     <PremiumCard delay={0.2}>
                         <h2 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">

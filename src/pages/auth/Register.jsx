@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { User, Mail, Lock, Store, Loader2, ArrowRight, CheckCircle2, Eye, EyeOff } from 'lucide-react';
-import { authService } from '../lib/api';
+import { authService } from '../../lib/api';
 
 export default function Register() {
     const [formData, setFormData] = useState({ email: '', password: '', storeName: '', accountType: 'INDIVIDUAL', username: '' });
