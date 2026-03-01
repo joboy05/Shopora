@@ -18,8 +18,9 @@ export default function Storefront() {
         try {
             setLoading(true);
             const response = await productService.getAll();
+            const all = Array.isArray(response.data?.data) ? response.data.data : [];
             // Only show active products on storefront
-            setProducts(response.data.filter(p => p.status === 'active'));
+            setProducts(all.filter(p => p.status === 'active'));
         } catch (error) {
             console.error('Failed to fetch products:', error);
         } finally {

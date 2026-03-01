@@ -18,7 +18,13 @@ export default function Register() {
             const response = await authService.register(formData);
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('user', JSON.stringify(response.data.user));
-            navigate('/');
+            
+            // Redirect based on user role
+            if (response.data.user.role === 'SELLER') {
+                navigate('/company');  // Company users go to company dashboard
+            } else {
+                navigate('/');        // Admin users go to admin dashboard
+            }
         } catch (err) {
             setError(err.response?.data?.error || "Une erreur est survenue lors de l'inscription.");
         } finally {
@@ -68,7 +74,7 @@ export default function Register() {
                                     <input
                                         type="text"
                                         required
-                                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-black focus:outline-none transition-all font-medium text-sm"
+                                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-black focus:outline-none transition-all font-medium text-slate-900"
                                         placeholder="Le Coin de Marie"
                                         value={formData.storeName}
                                         onChange={(e) => setFormData({ ...formData, storeName: e.target.value })}
@@ -83,7 +89,7 @@ export default function Register() {
                                     <input
                                         type="text"
                                         required
-                                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-black focus:outline-none transition-all font-medium text-sm"
+                                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-black focus:outline-none transition-all font-medium text-slate-900"
                                         placeholder="marie.d"
                                         value={formData.username}
                                         onChange={(e) => setFormData({ ...formData, username: e.target.value })}
@@ -99,7 +105,7 @@ export default function Register() {
                                 <input
                                     type="email"
                                     required
-                                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-black focus:outline-none transition-all font-medium text-sm"
+                                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-black focus:outline-none transition-all font-medium text-slate-900"
                                     placeholder="marie@email.com"
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -114,7 +120,7 @@ export default function Register() {
                                 <input
                                     type={showPassword ? "text" : "password"}
                                     required
-                                    className="w-full pl-10 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-black focus:outline-none transition-all font-medium text-sm"
+                                    className="w-full pl-10 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-black focus:outline-none transition-all font-medium text-slate-900"
                                     placeholder="••••••••"
                                     value={formData.password}
                                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}

@@ -2,12 +2,12 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 
 /**
- * Protects the admin dashboard.
- * - ADMIN → full access
- * - SELLER → redirected to /company (company dashboard)
+ * Protects routes reserved for SELLER (Entreprise) role.
+ * - SELLER → access granted
+ * - ADMIN → also allowed (admins can see everything)
  * - USER / unauthenticated → redirected to /login
  */
-const ProtectedRoute = ({ children }) => {
+const SellerRoute = ({ children }) => {
     const token = localStorage.getItem('token');
     const userJson = localStorage.getItem('user');
 
@@ -17,9 +17,7 @@ const ProtectedRoute = ({ children }) => {
 
     try {
         const user = JSON.parse(userJson);
-        if (user.role === 'SELLER') {
-            return <Navigate to="/company" replace />;
-        } else if (user.role !== 'ADMIN') {
+        if (user.role !== 'SELLER' && user.role !== 'ADMIN') {
             return <Navigate to="/store" replace />;
         }
     } catch (e) {
@@ -29,4 +27,4 @@ const ProtectedRoute = ({ children }) => {
     return children;
 };
 
-export default ProtectedRoute;
+export default SellerRoute;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { TrendingUp, Users, ShoppingBag, BarChart2, ArrowUpRight, ArrowDownRight, Package } from 'lucide-react';
+import { TrendingUp, Users, ShoppingBag, BarChart2, ArrowUpRight, ArrowDownRight, Package, Globe } from 'lucide-react';
 import { PremiumCard } from '../../components/ui/PremiumCard';
 import { motion } from 'framer-motion';
 import {
@@ -25,15 +25,21 @@ const stats = [
 
 export default function Dashboard() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    const isPro = user.accountType === 'COMPANY';
-    const displayName = isPro ? user.storeName : user.username;
+    const isAdmin = user.role === 'ADMIN';
+    const isSeller = user.role === 'SELLER'; // Company account
+    const displayName = user.storeName || user.username || user.email?.split('@')[0];
 
     return (
         <div className="space-y-10 pb-20">
             <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-3">
                     <h1 className="text-4xl font-black tracking-tighter">Tableau de bord</h1>
-                    {isPro && (
+                    {isAdmin && (
+                        <div className="bg-gradient-to-r from-red-500 to-rose-600 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-[0_0_15px_rgba(239,68,68,0.4)] uppercase tracking-widest">
+                            Super Admin
+                        </div>
+                    )}
+                    {isSeller && (
                         <div className="bg-gradient-to-r from-amber-400 to-orange-500 text-black text-[10px] font-black px-3 py-1 rounded-full shadow-[0_0_15px_rgba(251,191,36,0.3)] uppercase tracking-widest">
                             Compte Pro
                         </div>
@@ -134,7 +140,7 @@ export default function Dashboard() {
                 </PremiumCard>
             </div>
 
-            {isPro && (
+            {(isAdmin || isSeller) && (
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}

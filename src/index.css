@@ -152,6 +152,20 @@
     ::-webkit-scrollbar-thumb {
         @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
     }
+
+    /* Fix for input text color */
+    input, select, textarea {
+        color: #0f172a !important;
+    }
+
+    input::placeholder, textarea::placeholder {
+        color: #64748b !important;
+    }
+
+    select option {
+        color: #0f172a !important;
+        background-color: white !important;
+    }
 }
 
 /* Animations concepts */

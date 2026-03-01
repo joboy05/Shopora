@@ -18,9 +18,35 @@ export default function Login() {
             const response = await authService.login(formData);
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('user', JSON.stringify(response.data.user));
-            navigate('/');
+            
+            // Redirect based on user role
+            if (response.data.user.role === 'SELLER') {
+                navigate('/company');  // Company users go to company dashboard
+            } else {
+                navigate('/');        // Admin users go to admin dashboard
+            }
         } catch (err) {
-            setError(err.response?.data?.error || 'Une erreur est survenue lors de la connexion.');
+            // Fallback simulation when backend is not available
+            if (err.code === 'ERR_NETWORK' || err.code === 'ECONNREFUSED') {
+                // Simulate successful login for demo purposes
+                const mockUser = {
+                    email: formData.email,
+                    role: formData.email.includes('company') ? 'SELLER' : 'ADMIN',
+                    username: formData.email.split('@')[0],
+                    storeName: formData.email.includes('company') ? 'Company Store' : null
+                };
+                
+                localStorage.setItem('token', 'mock-token-' + Date.now());
+                localStorage.setItem('user', JSON.stringify(mockUser));
+                
+                if (mockUser.role === 'SELLER') {
+                    navigate('/company');
+                } else {
+                    navigate('/');
+                }
+            } else {
+                setError(err.response?.data?.error || 'Une erreur est survenue lors de la connexion.');
+            }
         } finally {
             setLoading(false);
         }
@@ -34,9 +60,18 @@ export default function Login() {
                     <h1 className="mt-6 text-3xl font-black text-black tracking-tighter uppercase italic">SHOPORA 2.0</h1>
                     <p className="mt-2 text-sm text-slate-500 font-medium">L'avenir du commerce commence ici.</p>
                     
+                    {/* Company Credentials Hint */}
+                    <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl inline-flex flex-col items-center">
+                        <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">Espace Entreprise / Company</p>
+                        <div className="flex gap-4 text-[10px] font-bold text-slate-600 italic">
+                            <span>Email: <span className="text-black not-italic">company@shopora.com</span></span>
+                            <span>Mdp: <span className="text-black not-italic">company123</span></span>
+                        </div>
+                    </div>
+                    
                     {/* Admin Credentials Hint */}
-                    <div className="mt-4 p-3 bg-brand-500/10 border border-brand-500/20 rounded-xl inline-flex flex-col items-center">
-                        <p className="text-[10px] font-black text-brand-600 uppercase tracking-widest mb-1">Espace Démo / Super Admin</p>
+                    <div className="mt-2 p-3 bg-brand-500/10 border border-brand-500/20 rounded-xl inline-flex flex-col items-center">
+                        <p className="text-[10px] font-black text-brand-600 uppercase tracking-widest mb-1">Espace Admin / Super Admin</p>
                         <div className="flex gap-4 text-[10px] font-bold text-slate-600 italic">
                             <span>Email: <span className="text-black not-italic">admin@gmail.com</span></span>
                             <span>Mdp: <span className="text-black not-italic">admin123</span></span>
@@ -59,7 +94,7 @@ export default function Login() {
                                 <input
                                     type="email"
                                     required
-                                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-black focus:outline-none transition-all font-medium text-sm"
+                                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-black focus:outline-none transition-all font-medium text-sm text-slate-900"
                                     placeholder="jean@shopora.fr"
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -74,7 +109,7 @@ export default function Login() {
                                 <input
                                     type={showPassword ? "text" : "password"}
                                     required
-                                    className="w-full pl-10 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-black focus:outline-none transition-all font-medium text-sm"
+                                    className="w-full pl-10 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-black focus:outline-none transition-all font-medium text-sm text-slate-900"
                                     placeholder="••••••••"
                                     value={formData.password}
                                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}

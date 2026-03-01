@@ -32,8 +32,17 @@ import ThemeEditor from './pages/store/ThemeEditor';
 import Pages from './pages/store/Pages';
 import Storefront from './pages/store/Storefront';
 
+// Company
+import CompanyProfile from './pages/admin/CompanyProfile';
+import TeamManagement from './pages/admin/TeamManagement';
+import GlobalAnalytics from './pages/admin/GlobalAnalytics';
+import CompanyDashboard from './pages/admin/CompanyDashboard';
+import CompanySettings from './pages/admin/CompanySettings';
+import { CompanyLayout } from './components/layout/CompanyLayout';
+
 // Layout & Auth Guards
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import SellerRoute from './components/auth/SellerRoute';
 import { Layout } from './components/layout/Layout';
 import { ThemeProvider } from './context/ThemeContext';
 
@@ -42,9 +51,14 @@ function App() {
     <ThemeProvider>
       <BrowserRouter>
         <Routes>
+          {/* Public Storefront */}
           <Route path="/store" element={<Storefront />} />
+          
+          {/* Auth */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          
+          {/* Admin Dashboard */}
           <Route path="/" element={
             <ProtectedRoute>
               <Layout />
@@ -68,6 +82,19 @@ function App() {
               <Route path="themes/:id/edit" element={<ThemeEditor />} />
               <Route path="pages" element={<Pages />} />
             </Route>
+          </Route>
+          
+          {/* Company Dashboard - Separate Layout */}
+          <Route path="/company" element={
+            <SellerRoute>
+              <CompanyLayout />
+            </SellerRoute>
+          }>
+            <Route index element={<CompanyDashboard />} />
+            <Route path="profile" element={<CompanyProfile />} />
+            <Route path="team" element={<TeamManagement />} />
+            <Route path="analytics" element={<GlobalAnalytics />} />
+            <Route path="settings" element={<CompanySettings />} />
           </Route>
         </Routes>
       </BrowserRouter>
